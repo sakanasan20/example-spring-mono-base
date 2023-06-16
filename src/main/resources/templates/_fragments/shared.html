@@ -7,6 +7,15 @@
 	<link rel="stylesheet" th:href="@{/webjars/bootstrap-icons/1.10.5/font/bootstrap-icons.css}">
 </head>
 <body>
+	<nav th:fragment="navbar (text)" class="navbar bg-body-tertiary">
+		<div class="container-fluid">
+			<a class="navbar-brand" th:text="${text}"></a>
+			<div class="d-flex" role="search">
+				<button class="btn btn-outline-success mx-1">Login</button>
+				<button class="btn btn-outline-success mx-1">Logout</button>
+			</div>
+		</div>
+	</nav>
 	<script th:fragment="bootstrap-script" th:src="@{/webjars/bootstrap/5.3.0/dist/js/bootstrap.bundle.min.js}"></script>
 </body>
 </html>
