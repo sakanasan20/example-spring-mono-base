@@ -8,19 +8,36 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
 import tw.niq.example.controller.HomeController;
+import tw.niq.example.service.UserService;
 
 @Configuration
 @EnableWebSecurity
 public class WebSecurity {
+	
+	private final UserService userService;
+	
+	private final BCryptPasswordEncoder bCryptPasswordEncoder;
+
+	public WebSecurity(UserService userService, BCryptPasswordEncoder bCryptPasswordEncoder) {
+		this.userService = userService;
+		this.bCryptPasswordEncoder = bCryptPasswordEncoder;
+	}
 
 	@Bean
 	protected SecurityFilterChain configure(HttpSecurity http) throws Exception {
+		
 		AuthenticationManagerBuilder authenticationManagerBuilder = http.getSharedObject(AuthenticationManagerBuilder.class);
+		
+		authenticationManagerBuilder.userDetailsService(userService).passwordEncoder(bCryptPasswordEncoder);
+		
 		AuthenticationManager authenticationManager = authenticationManagerBuilder.build();
+		
 		http.authenticationManager(authenticationManager);
+		
 		http.authorizeHttpRequests((authorize) -> authorize
 			.requestMatchers(PathRequest.toH2Console()).permitAll()
 			.requestMatchers("/webjars/**").permitAll()
@@ -28,6 +45,7 @@ public class WebSecurity {
 			.anyRequest().authenticated())
 			.csrf((csrf) -> csrf.disable())
 			.headers((headers) -> headers.frameOptions((frameOptions) -> frameOptions.disable()));
+		
 		return http.build();
 	}
 	
