@@ -1,6 +1,7 @@
 package tw.niq.example.bootstrap;
 
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import jakarta.transaction.Transactional;
@@ -12,8 +13,11 @@ public class DataLoader implements CommandLineRunner {
 
 	private final UserRepository userRepository;
 	
-	public DataLoader(UserRepository userRepository) {
+	private final BCryptPasswordEncoder bCryptPasswordEncoder;
+	
+	public DataLoader(UserRepository userRepository, BCryptPasswordEncoder bCryptPasswordEncoder) {
 		this.userRepository = userRepository;
+		this.bCryptPasswordEncoder = bCryptPasswordEncoder;
 	}
 
 	@Transactional
@@ -24,7 +28,7 @@ public class DataLoader implements CommandLineRunner {
 
 	private void createAdmin() {
 		if (!userRepository.findByUsername("admin").isPresent()) {
-			userRepository.save(UserEntity.builder().username("admin").password("admin").build());
+			userRepository.save(UserEntity.builder().username("admin").password(bCryptPasswordEncoder.encode("admin")).build());
 		}
 	}
 
