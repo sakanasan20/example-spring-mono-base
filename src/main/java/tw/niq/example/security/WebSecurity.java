@@ -36,15 +36,22 @@ public class WebSecurity {
 		
 		AuthenticationManager authenticationManager = authenticationManagerBuilder.build();
 		
+		AuthenticationFilter authenticationFilter = new AuthenticationFilter(authenticationManager, userService);
+		
+		authenticationFilter.setFilterProcessesUrl("/login");
+		
 		http.authenticationManager(authenticationManager);
 		
 		http.authorizeHttpRequests((authorize) -> authorize
 			.requestMatchers(PathRequest.toH2Console()).permitAll()
+			.requestMatchers("/login", "/logout").permitAll()
 			.requestMatchers("/webjars/**").permitAll()
 			.requestMatchers(HttpMethod.GET, HomeController.REQUEST_PATH).permitAll()
 			.anyRequest().authenticated())
 			.csrf((csrf) -> csrf.disable())
-			.headers((headers) -> headers.frameOptions((frameOptions) -> frameOptions.disable()));
+			.headers((headers) -> headers.frameOptions((frameOptions) -> frameOptions.disable()))
+			.addFilter(authenticationFilter)
+			.logout((logout) -> logout.logoutUrl("/logout").logoutSuccessUrl("/home"));
 		
 		return http.build();
 	}
