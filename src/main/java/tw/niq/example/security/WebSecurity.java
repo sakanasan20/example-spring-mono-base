@@ -25,7 +25,9 @@ public class WebSecurity {
 			.requestMatchers(PathRequest.toH2Console()).permitAll()
 			.requestMatchers("/webjars/**").permitAll()
 			.requestMatchers(HttpMethod.GET, HomeController.REQUEST_PATH).permitAll()
-			.anyRequest().authenticated());
+			.anyRequest().authenticated())
+			.csrf((csrf) -> csrf.disable())
+			.headers((headers) -> headers.frameOptions((frameOptions) -> frameOptions.disable()));
 		return http.build();
 	}
 	
